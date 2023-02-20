@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MQTT_K</string>
+
+    <string name="setting">設定</string>
+    <string name="home">主頁</string>
+    <string name="messages">訊息</string>
 </resources>
