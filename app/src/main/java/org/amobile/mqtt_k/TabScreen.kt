@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.dp
 
 enum class TabPage(val icon: ImageVector, val tabName : String) {
 //    Resources.getSystem().getString(R.string.setting)
-
-
     SETTINGS(Icons.Default.Settings, "設定"),
     HOME(Icons.Default.Home, "主頁"),
     MESSAGES(Icons.Default.Email, "訊息"),
