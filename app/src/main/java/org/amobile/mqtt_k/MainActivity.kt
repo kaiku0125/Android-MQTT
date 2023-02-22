@@ -30,6 +30,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import org.amobile.mqtt_k.prefs.Prefs
 import org.amobile.mqtt_k.ui.theme.MQTT_KTheme
 
 class MainActivity : ComponentActivity() {
@@ -84,6 +85,8 @@ class MainActivity : ComponentActivity() {
                 //surface end
 
             }
+
+            Prefs.load(this)
         }
     }
 
