@@ -95,6 +95,7 @@ fun HomeUI() {
 //            val text = remember { mutableStateOf(TextFieldValue("TEXT")) }
 //            val focusManager = LocalFocusManager.current
         MyTextField(
+            labelHint = "UserName",
             hideKeyboard = hideKeyboard,
             onFocusClear = { hideKeyboard = false },
             modifier = Modifier.constrainAs(userNameTextField) {
@@ -105,6 +106,7 @@ fun HomeUI() {
         )
 
         MyTextField(
+            labelHint = "ClientID",
             hideKeyboard = hideKeyboard,
             onFocusClear = { hideKeyboard = false },
             modifier = Modifier.constrainAs(clientIDTextField) {
@@ -148,6 +150,7 @@ fun InitUI(name: String) {
 
 @Composable
 fun MyTextField(
+    labelHint : String,
     hideKeyboard: Boolean,
     onFocusClear: () -> Unit = {},
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
@@ -163,7 +166,7 @@ fun MyTextField(
         }),
         maxLines = 1,
         singleLine = true,
-        label = { Text(text = "UserName") },
+        label = { Text(text = labelHint) },
         modifier = modifier
             .onFocusChanged {
                 if (!it.isFocused) {
