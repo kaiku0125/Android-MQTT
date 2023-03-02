@@ -13,9 +13,9 @@ class Prefs {
         private const val TAG = "Prefs"
 
         //        const val isDarkMode: Boolean = false
-        var userName: String = "777"
-        var clientID: String = "888"
-        var companyName: String = "999"
+        var userName: String = ""
+        var clientID: String = ""
+        var companyName: String = ""
 
         fun load(ctx: Context) {
             userName = Shared.get(ctx, KEY_USERNAME, userName)

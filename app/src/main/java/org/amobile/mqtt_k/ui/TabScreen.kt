@@ -1,4 +1,4 @@
-package org.amobile.mqtt_k
+package org.amobile.mqtt_k.ui
 
 import android.content.res.Resources
 import androidx.compose.animation.core.Spring
