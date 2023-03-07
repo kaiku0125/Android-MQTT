@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -24,10 +25,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewmodel.compose.viewModel
+import org.amobile.mqtt_k.MQTTViewModel
+import org.amobile.mqtt_k.MQTTViewModelFactory
+import org.amobile.mqtt_k.Presenter
 import org.amobile.mqtt_k.prefs.Prefs
+
+private const val TAG = "Home"
 
 @Composable
 fun HomeUI(ctx: Context) {
+    Log.e("HomeUI", "HomeUI: ")
+    val presenter = Presenter(ctx)
+    val viewModel : MQTTViewModel = viewModel(factory = MQTTViewModelFactory(ctx))
+    val checkingState by viewModel.isMQTTRunning.observeAsState(false)
+
+
     var hideKeyboard by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     ConstraintLayout(modifier = Modifier
@@ -115,9 +128,16 @@ fun HomeUI(ctx: Context) {
         val checkedState = remember { mutableStateOf(false) }
 
         MyConnectToggleButton(
-            isConnected = checkedState.value,
+            isConnected = checkingState,
             onClick = {
-                checkedState.value = !checkedState.value
+                viewModel.btnClick()
+
+//                checkedState.value = !checkedState.value
+//                Log.e(TAG, "HomeUI: ${checkedState.value}")
+//                if(checkedState.value)
+//                    presenter.doMQTTConnection()
+//                else
+//                    presenter.endConnection()
             },
             modifier = Modifier.constrainAs(toggleBtn) {
                 top.linkTo(columnState.bottom)

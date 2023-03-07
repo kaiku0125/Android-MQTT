@@ -57,7 +57,9 @@ fun MainView(ctx: Context) {
 //                                InitUI(TabPage.values()[index].name)
                 when (index) {
                     TabPage.SETTINGS.ordinal -> InitUI(TabPage.values()[index].name)
-                    1 -> HomeUI(ctx)
+                    1 -> {
+                        HomeUI(ctx)
+                    }
                     2 -> InitUI(TabPage.values()[index].name)
                 }
             }

@@ -1,23 +1,36 @@
 package org.amobile.mqtt_k
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.amobile.mqtt_k.prefs.Prefs
 import org.amobile.mqtt_k.ui.MainView
 import org.amobile.mqtt_k.ui.theme.MQTT_KTheme
+import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
+    lateinit var statusUpdateIntentReceiver : StatusUpdateReceiver
+    lateinit var viewModel : MQTTViewModel
     companion object {
         private const val TAG = "MainActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Prefs.load(this)
+        viewModel = ViewModelProvider(this, MQTTViewModelFactory(this)).get(MQTTViewModel::class.java)
         setContent {
             MQTT_KTheme(darkTheme = true) {
                 // A surface container using the 'background' color from the theme
@@ -30,7 +43,46 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        Prefs.load(this)
+
+
+    }
+
+    override fun onResume() {
+        Log.e(TAG, "onResume: ")
+        super.onResume()
+        statusUpdateIntentReceiver = StatusUpdateReceiver()
+//        val intentFilter = IntentFilter(MQTTServiceExecutor.MQTT_STATUS_INTENT).also {
+//            registerReceiver(statusUpdateIntentReceiver, it)
+//        }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(MQTTServiceExecutor.MQTT_STATUS_INTENT)
+        registerReceiver(statusUpdateIntentReceiver, intentFilter)
+
+        Thread{
+            viewModel.checkMQTTConnection()
+        }.start()
+
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(statusUpdateIntentReceiver)
+
+    }
+
+    class StatusUpdateReceiver : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
+            val notificationData = intent?.extras
+            val newStatus = notificationData?.getString(MQTTServiceExecutor.MQTT_STATUS_MSG)
+            Log.e(TAG, "onReceive: $newStatus")
+
+            if(newStatus.equals("Connected"))
+                Toast.makeText(ctx, "訂閱成功", Toast.LENGTH_SHORT).show()
+
+
+        }
+
     }
 
 
