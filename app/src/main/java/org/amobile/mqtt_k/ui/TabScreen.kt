@@ -1,5 +1,7 @@
 package org.amobile.mqtt_k.ui
 
+import android.app.Application
+import android.content.Context
 import android.content.res.Resources
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDp
@@ -20,14 +22,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import org.amobile.mqtt_k.R
 
 enum class TabPage(val icon: ImageVector, val tabName : String) {
 //    Resources.getSystem().getString(R.string.setting)
     SETTINGS(Icons.Default.Settings, "設定"),
     HOME(Icons.Default.Home, "主頁"),
     MESSAGES(Icons.Default.Email, "訊息"),
-
 }
 
 @Composable

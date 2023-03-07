@@ -31,7 +31,7 @@ class MyMqttAndroidClient private constructor(){
                 if(instance!!.isConnected){
                     connect = true
                 }
-            Log.e("MyMqttAndroidClient", "isConnecting: $connect")
+            Log.e("MyMqttAndroidClient", "isClientConnecting ➔ $connect")
             return connect
         }
     }

@@ -10,13 +10,14 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import org.amobile.mqtt_k.prefs.Prefs
 import org.amobile.mqtt_k.push_notification.Connection
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
 
-class MQTTServiceExecutor : Service, MqttCallback {
+class MQTTServiceExecutor() : Service(), MqttCallback {
     companion object {
         private const val TAG = "MQTTServiceExecutor"
         private const val MAX_MQTT_CLIENT_ID_LENGTH: Int = 22
@@ -37,35 +38,25 @@ class MQTTServiceExecutor : Service, MqttCallback {
                     if (MQTTServiceExecutor::class.java.name.equals(myRunningService.service.className))
                         isRunning = true;
                 }
-                Log.e(TAG, "isForegroundServiceRunning: $isRunning")
+                Log.e(TAG, "isForegroundServiceRunning ➔ $isRunning")
             } catch (e: Exception) {
                 e.printStackTrace()
-                Log.e(TAG, "isForegroundServiceRunning: exception -> $e")
+                Log.e(TAG, "isForegroundServiceRunning: exception ➔ $e")
             }
             return isRunning
         }
     }
 
-    enum class MQTTStatus {
-        DEFAULT,
-        CONNECTING,
-        CONNECTED,
-        DISCONNECTED,
-        ERROR
+    enum class MQTTStatus(val description : String) {
+        DEFAULT("..."),
+        CONNECTING("連接中..."),
+        CONNECTED("已連接 !"),
+        DISCONNECTED("已中斷"),
+        ERROR("錯誤")
     }
 
     lateinit var mClient: MqttAndroidClient
     var connectionStatus: MQTTStatus = MQTTStatus.DEFAULT
-
-
-    init {
-
-    }
-
-
-    constructor() {
-        Log.e(TAG, "sdfsdf")
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -96,6 +87,7 @@ class MQTTServiceExecutor : Service, MqttCallback {
             mClient.setCallback(this)
             connectionStatus = MQTTStatus.CONNECTING
             rebroadcastStatus()
+            Log.e(TAG, "rebroadcastStatus: ${connectionStatus.name}")
         } catch (e: MqttException) {
             e.printStackTrace()
             Log.e(TAG, "Fail to connect to MQTT server! ");
@@ -107,7 +99,6 @@ class MQTTServiceExecutor : Service, MqttCallback {
         try {
             val listener = object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.e(TAG, "onSuccess: subscribe")
                     connectionStatus = MQTTStatus.CONNECTED
                     rebroadcastStatus()
                     notifyUser("Connected Success", "連線狀態", "連線已回復")
@@ -152,23 +143,10 @@ class MQTTServiceExecutor : Service, MqttCallback {
     override fun deliveryComplete(token: IMqttDeliveryToken?) {}
 
     private fun rebroadcastStatus() {
-        var status = ""
-
-        status = when (connectionStatus) {
-            MQTTStatus.DEFAULT -> " -- "
-            MQTTStatus.CONNECTING -> "Connecting..."
-            MQTTStatus.CONNECTED -> "Connected"
-            MQTTStatus.DISCONNECTED -> "DisConnected..."
-            MQTTStatus.ERROR -> "Error..."
-        }
-        Log.e(TAG, "rebroadcastStatus: $status")
-        broadcastServiceStatus(status)
-    }
-
-    private fun broadcastServiceStatus(statusDescription: String) {
+        Log.e(TAG, "rebroadcastStatus: ${connectionStatus.name}")
         val broadcastIntent = Intent()
         broadcastIntent.action = MQTT_STATUS_INTENT
-        broadcastIntent.putExtra(MQTT_STATUS_MSG, statusDescription)
+        broadcastIntent.putExtra(MQTT_STATUS_MSG, connectionStatus.ordinal)
         sendBroadcast(broadcastIntent)
     }
 
@@ -176,9 +154,8 @@ class MQTTServiceExecutor : Service, MqttCallback {
         Thread {
             try {
                 Thread.sleep(milliSeconds)
-                Log.e(TAG, "doConnect: enter thread")
                 if (mClient.isConnected) {
-                    Log.e(TAG, "doConnect: do subscribe !")
+//                    Log.e(TAG, "doConnect: do subscribe !")
                     doSubscribe()
                 }
             } catch (e: InterruptedException) {

@@ -17,6 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
@@ -28,19 +29,17 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.amobile.mqtt_k.MQTTViewModel
 import org.amobile.mqtt_k.MQTTViewModelFactory
-import org.amobile.mqtt_k.Presenter
+
 import org.amobile.mqtt_k.prefs.Prefs
 
 private const val TAG = "Home"
 
 @Composable
-fun HomeUI(ctx: Context) {
-    Log.e("HomeUI", "HomeUI: ")
-    val presenter = Presenter(ctx)
+fun HomeUI() {
+    val ctx = LocalContext.current
     val viewModel : MQTTViewModel = viewModel(factory = MQTTViewModelFactory(ctx))
     val checkingState by viewModel.isMQTTRunning.observeAsState(false)
-
-
+    val stateDescription by viewModel.mqttStatusDescription.observeAsState("...")
     var hideKeyboard by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     ConstraintLayout(modifier = Modifier
@@ -121,11 +120,9 @@ fun HomeUI(ctx: Context) {
             .padding(top = 10.dp)
             .width(220.dp)) {
             Text(text = "狀態 : ", fontStyle = Italic)
-            Text(text = "...", fontStyle = Italic)
+            Text(text = stateDescription, fontStyle = Italic)
         }
 
-
-        val checkedState = remember { mutableStateOf(false) }
 
         MyConnectToggleButton(
             isConnected = checkingState,

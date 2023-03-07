@@ -1,11 +1,11 @@
 package org.amobile.mqtt_k
 
+import android.content.ClipDescription
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,15 +16,17 @@ class MQTTViewModel(ctx: Context) : ViewModel() {
     companion object{
         private const val TAG = "MQTTViewModel"
     }
-    private val mContext = ctx
+    private val mqttLogic = MQTTLogic(ctx)
 
     private val _isMQTTRunningLive = MutableLiveData(false)
     val isMQTTRunning : LiveData<Boolean>
         get() = _isMQTTRunningLive
 
-    fun checkMQTTConnection(){
-        val connection : Boolean = MQTTServiceExecutor.isForegroundServiceRunning(mContext) and MyMqttAndroidClient.isConnecting()
+    fun checkMQTTConnection(ctx : Context){
+        val connection : Boolean = MQTTServiceExecutor.isForegroundServiceRunning(ctx) and MyMqttAndroidClient.isConnecting()
         _isMQTTRunningLive.postValue(connection)
+        if(connection)
+            notifyStatusChange(mqttLogic.getConnectedStatus())
     }
 
     fun btnClick(){
@@ -32,47 +34,20 @@ class MQTTViewModel(ctx: Context) : ViewModel() {
         Log.e(TAG, "btnClick: $change")
         _isMQTTRunningLive.postValue(change)
         if(change == true){
-            doMQTTConnection()
+            mqttLogic.doMQTTConnection()
         }else{
-            endConnection()
-        }
-    }
-
-    private fun doMQTTConnection() {
-        if (MQTTServiceExecutor.isForegroundServiceRunning(mContext)) {
-            Log.e(TAG, "doMQTTConnection: Service is Running now!")
-            return
+            mqttLogic.endConnection()
         }
 
-        if (MyMqttAndroidClient.isConnecting()) {
-            Log.e(TAG, "doMQTTConnection: Server is connected !")
-            return
-        }
-
-        val svc = Intent(mContext, MQTTServiceExecutor::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            mContext.startForegroundService(svc)
-
     }
 
-    private fun endConnection() {
-        MQTTServiceExecutor.isPressedStop = true
-        val svc = Intent(mContext, MQTTServiceExecutor::class.java)
-        mContext.stopService(svc)
+    private val _mqttStatusDescriptionLive = MutableLiveData(MQTTServiceExecutor.MQTTStatus.DEFAULT.description)
+    val mqttStatusDescription : LiveData<String>
+        get() = _mqttStatusDescriptionLive
 
-        Thread {
-            try {
-                Thread.sleep(5000)
-                MQTTServiceExecutor.isPressedStop = false
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }.start()
+    fun notifyStatusChange(status: Int){
+        val changeDescription = mqttLogic.getMQTTStatusDescription(status)
+        _mqttStatusDescriptionLive.postValue(changeDescription)
     }
-
-    fun a(){
-        Log.e(TAG, "a: 77777777777777777")
-    }
-
 
 }

@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Prefs.load(this)
         viewModel = ViewModelProvider(this, MQTTViewModelFactory(this)).get(MQTTViewModel::class.java)
+
         setContent {
             MQTT_KTheme(darkTheme = true) {
                 // A surface container using the 'background' color from the theme
@@ -48,9 +49,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onResume() {
-        Log.e(TAG, "onResume: ")
         super.onResume()
-        statusUpdateIntentReceiver = StatusUpdateReceiver()
+        statusUpdateIntentReceiver = StatusUpdateReceiver(viewModel)
 //        val intentFilter = IntentFilter(MQTTServiceExecutor.MQTT_STATUS_INTENT).also {
 //            registerReceiver(statusUpdateIntentReceiver, it)
 //        }
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
         registerReceiver(statusUpdateIntentReceiver, intentFilter)
 
         Thread{
-            viewModel.checkMQTTConnection()
+            viewModel.checkMQTTConnection(this)
         }.start()
 
 
@@ -68,18 +68,19 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         unregisterReceiver(statusUpdateIntentReceiver)
-
     }
 
-    class StatusUpdateReceiver : BroadcastReceiver() {
+    class StatusUpdateReceiver(private val viewModel : MQTTViewModel) : BroadcastReceiver() {
         override fun onReceive(ctx: Context?, intent: Intent?) {
             val notificationData = intent?.extras
-            val newStatus = notificationData?.getString(MQTTServiceExecutor.MQTT_STATUS_MSG)
-            Log.e(TAG, "onReceive: $newStatus")
+            val newStatus = notificationData?.getInt(MQTTServiceExecutor.MQTT_STATUS_MSG)
+//            Log.e(TAG, "onReceive: $newStatus")
 
-            if(newStatus.equals("Connected"))
+            newStatus?.let { viewModel.notifyStatusChange(it) }
+            ctx?.let { viewModel.checkMQTTConnection(it) }
+
+            if(newStatus == MQTTServiceExecutor.MQTTStatus.CONNECTED.ordinal)
                 Toast.makeText(ctx, "訂閱成功", Toast.LENGTH_SHORT).show()
-
 
         }
 
