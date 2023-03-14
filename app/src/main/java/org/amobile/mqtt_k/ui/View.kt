@@ -2,7 +2,6 @@
 
 package org.amobile.mqtt_k.ui
 
-import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun MainView(ctx: Context) {
+fun MainView() {
     val pagerState = rememberPagerState(
         pageCount = TabPage.values().size,
         initialPage = TabPage.HOME.ordinal

@@ -32,7 +32,7 @@ import org.amobile.mqtt_k.MQTTViewModelFactory
 
 import org.amobile.mqtt_k.prefs.Prefs
 
-private const val TAG = "Home"
+private const val TAG = "HomeUI"
 
 @Composable
 fun HomeUI() {
@@ -48,7 +48,7 @@ fun HomeUI() {
             interactionSource = interactionSource,
             indication = null
         ) {
-            Log.e("TAG", "HomeUI: 7777")
+            Log.e(TAG, "onClick")
             hideKeyboard = true
         }) {
         val (userNameTextField, clientIDTextField, companyNameTextField, columnState, toggleBtn) = createRefs()
@@ -123,23 +123,16 @@ fun HomeUI() {
             Text(text = stateDescription, fontStyle = Italic)
         }
 
-
         MyConnectToggleButton(
             isConnected = checkingState,
             onClick = {
                 viewModel.btnClick()
-
-//                checkedState.value = !checkedState.value
-//                Log.e(TAG, "HomeUI: ${checkedState.value}")
-//                if(checkedState.value)
-//                    presenter.doMQTTConnection()
-//                else
-//                    presenter.endConnection()
             },
             modifier = Modifier.constrainAs(toggleBtn) {
                 top.linkTo(columnState.bottom)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
             }
         )
 
