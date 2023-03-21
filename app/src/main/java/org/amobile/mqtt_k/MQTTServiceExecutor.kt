@@ -56,10 +56,12 @@ class MQTTServiceExecutor() : Service(), MqttCallback {
     }
 
     lateinit var mClient: MqttAndroidClient
+    lateinit var mRepository: MainRepository
     var connectionStatus: MQTTStatus = MQTTStatus.DEFAULT
 
     override fun onCreate() {
         super.onCreate()
+        mRepository = MainRepository(application)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForeground(1002, getNotificationChannelBuilder().build())
         }
@@ -130,14 +132,17 @@ class MQTTServiceExecutor() : Service(), MqttCallback {
     }
 
     override fun messageArrived(topic: String?, message: MqttMessage?) {
-        Log.e(TAG, "messageArrived : topic -> $topic \n message -> ${message.toString()}")
-//        Log.e(TAG, "messageArrived: topic : " + topic + "\n" +
-//                "message : " + message.toString())
+        Log.e(TAG, "messageArrived : topic ➔ $topic \n message ➔ ${message.toString()}")
         val data = message.toString()
 //        if (!db.isDataExist(data)) {
 //            notifyUser("New data received", topic, data)
 //            db.addInformation(message.toString())
 //        }
+
+//        notifyUser("New data received", "amobile", data)
+        topic?.let { notifyUser("New data received", it, data) }
+        mRepository.insert(AlarmInfoEntity(0, data))
+
     }
 
     override fun deliveryComplete(token: IMqttDeliveryToken?) {}

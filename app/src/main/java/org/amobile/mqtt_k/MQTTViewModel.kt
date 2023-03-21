@@ -1,5 +1,6 @@
 package org.amobile.mqtt_k
 
+import android.app.Application
 import android.content.ClipDescription
 import android.content.Context
 import android.content.Intent
@@ -18,7 +19,7 @@ class MQTTViewModel(ctx: Context) : ViewModel() {
     }
 
     private val mqttLogic = MQTTLogic(ctx)
-//    private val mRepository = MainRepository(ctx)
+//    private val mRepository = MainRepository()
 
     private val _isMQTTRunningLive = MutableLiveData(false)
     val isMQTTRunning: LiveData<Boolean>
@@ -53,5 +54,10 @@ class MQTTViewModel(ctx: Context) : ViewModel() {
         val changeDescription = mqttLogic.getMQTTStatusDescription(status)
         _mqttStatusDescriptionLive.postValue(changeDescription)
     }
+
+//    fun insertMsg(info: AlarmInfoEntity) {
+//        mRepository.insert(info)
+//    }
+
 
 }

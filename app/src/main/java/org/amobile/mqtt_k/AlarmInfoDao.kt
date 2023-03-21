@@ -9,9 +9,9 @@ import androidx.room.Query
 import androidx.room.Update
 
 @Dao
-public interface AlarmInfoDao {
+interface AlarmInfoDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     fun insert(info : AlarmInfoEntity)
 
     @Update
