@@ -19,7 +19,6 @@ class MQTTViewModel(ctx: Context) : ViewModel() {
     }
 
     private val mqttLogic = MQTTLogic(ctx)
-//    private val mRepository = MainRepository()
 
     private val _isMQTTRunningLive = MutableLiveData(false)
     val isMQTTRunning: LiveData<Boolean>
@@ -55,9 +54,7 @@ class MQTTViewModel(ctx: Context) : ViewModel() {
         _mqttStatusDescriptionLive.postValue(changeDescription)
     }
 
-//    fun insertMsg(info: AlarmInfoEntity) {
-//        mRepository.insert(info)
-//    }
+
 
 
 }
