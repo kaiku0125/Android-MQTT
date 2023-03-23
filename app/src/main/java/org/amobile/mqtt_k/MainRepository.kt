@@ -1,10 +1,8 @@
 package org.amobile.mqtt_k
 
-import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import kotlinx.coroutines.*
 
 class MainRepository {
@@ -16,7 +14,6 @@ class MainRepository {
         val dataBase: AlarmInfoDataBase = AlarmInfoDataBase.getInstance(ctx)
         infoDao = dataBase.alarmInfoDao()
         allInfo = infoDao.getAllInfo()
-        Log.e(TAG, "allInfo ➔ ${allInfo.value?.get(0)?.infoMsg}")
     }
 
     fun insert(info: AlarmInfoEntity){
@@ -38,7 +35,7 @@ class MainRepository {
     }
 
     fun deleteAllInfo(){
-
+        infoDao.deleteAllInfo()
     }
 
 

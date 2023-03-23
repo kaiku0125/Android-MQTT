@@ -1,9 +1,13 @@
 package org.amobile.mqtt_k
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AlarmInfoViewModel(ctx :Context) : ViewModel() {
     companion object{
@@ -18,6 +22,17 @@ class AlarmInfoViewModel(ctx :Context) : ViewModel() {
 
 
     fun insertMsg(info: AlarmInfoEntity) {
-        mRepository.insert(info)
+        viewModelScope.launch(Dispatchers.IO) {
+            mRepository.insert(info)
+        }
+
+    }
+
+    fun deleteAllData(){
+        viewModelScope.launch(Dispatchers.IO) {
+//            Log.e(TAG, "deleteAllData: ${Thread.currentThread().name}")
+            mRepository.deleteAllInfo()
+        }
+
     }
 }
